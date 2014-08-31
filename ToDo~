@@ -1,0 +1,5 @@
+Planned changes in later Versions (List is not exclusive...):
+
+* Generalize the 'gtfToBed' function 
+* Change the eQTL summary function
+* Add the annotation track option for the eQTL plot
