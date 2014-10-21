@@ -1,4 +1,4 @@
-import(gMWT, parallel, plotrix, Rcpp, RcppArmadillo, hoardeR)
+import(gMWT, parallel, plotrix, Rcpp, RcppArmadillo, hoardeR, snpStats)
 
 S3method(print,eqtl)
 S3method(plot,eqtl)
@@ -10,6 +10,6 @@ S3method(plot,mdr)
 
 S3method(print,mdrPredict)
 
-export(calcDistances, eQTL, genotypePlot, getRegionsOI, gtfToBed, mdr, recodeData, visTrans)
+export(calcDistances, eQTL, QTL, genotypePlot, getRegionsOI, gtfToBed, mdr, recodeData, visTrans)
 
 useDynLib(GeneticTools)

@@ -8,11 +8,12 @@
 \usage{data(annotTrack)}
 
 \format{
-  A data frame with 1001 rows, each representing one annotation with columns as provided from standard gtf format. 
+  A data frame with 1001 rows, each representing one annotation with columns as in standard gtf format. 
 }
 
 \details{
-  This is an example bos taurus (Cow) annotation track as it was imported from the Ensemble ftp download page. In total there are 1001 annotations from the bovine genome in release 76.
+  This is an example Bos Taurus (Cow) annotation track as it was imported from the Ensembl ftp download page. In total there are 1001 annotations from   
+  the bovine genome, release 76.
   The data was imported with the \code{hoardeR::importGTF} function.
 }
 
@@ -21,14 +22,14 @@
 }
 
 \seealso{
-  \link{\code{hoardeR::importGTF}}
+  \link[hoardeR]{importGTF}
 }
 
 \examples{
 data(annotTrack)
 head(annotTrack)
-library(hoardeR)
 ## Not run:
+library(hoardeR)
 importGTF(gtf="Bos_taurus.UMD3.1.76.gtf", nrow=1001, skip=5)
 ## End(Not Run)
 }
