@@ -18,6 +18,3 @@ calcDistances.Splines <- function(X,df){
     #deriv1 <- predict(temp,seq(1,NC,0.1),deriv=1)$y
   }
 }
-
-X <- matrix(sample(1000,200),ncol=20)
-calcDistances(X, method="sp", df=18)
