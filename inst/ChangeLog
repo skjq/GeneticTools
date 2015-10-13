@@ -1,6 +1,7 @@
 LOG of the CHANGES in the package GeneticTools
 
 Version 0.4:
+* namespace cleaned up
 * Fixed typos in the manual
 * Added the dependency hoardeR
 * Changed the example annotation track 'annotTrack'

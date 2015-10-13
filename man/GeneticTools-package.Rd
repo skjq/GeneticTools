@@ -16,7 +16,7 @@
     Package: \tab GeneticTools\cr
     Type: \tab Package\cr
     Version: \tab 0.4\cr
-    Date: \tab 2014-08-13\cr
+    Date: \tab 2015-10-13\cr
     License: \tab GPL\cr
     LazyLoad: \tab yes\cr
   }
@@ -25,7 +25,7 @@
 \author{
   Daniel Fischer
 
-  Maintainer: Daniel Fischer <daniel.fischer@uta.fi>
+  Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 }
 
 \keyword{multivariate}
