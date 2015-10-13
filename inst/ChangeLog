@@ -1,6 +1,7 @@
 LOG of the CHANGES in the package GeneticTools
 
 Version 0.4:
+* Input and output fixed in 'calcDistancesW'
 * namespace cleaned up
 * Fixed typos in the manual
 * Added the dependency hoardeR

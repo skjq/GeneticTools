@@ -1,20 +1,35 @@
-# Experimental parts on time series clustering and the corresponding distances measures
+# Experimental parts on time series clustering and the corresponding distance measures
 
-calcDistances <- function(X,method=c("euclidean","splines"),df=NULL){
-  method <- match.arg(method)
+calcDistances <- function(X,method="euclidean", spar=0.1, ...){
+  method <- match.arg(method, c("euclidean", "splines"))
   res <- c()
-  if(method=="euclidean") res <- calcDistances.C(X)
-  if(method=="splines") res <- calcDistances.Splines(X,nodes=nodes)
+  if(method=="euclidean") res <- calcDistances.C(X)$distMat
+  if(method=="splines") res <- calcDistances.Splines(X, spar, ...)
   res
 } 
 
-calcDistances.Splines <- function(X,df){
+calcDistances.Splines <- function(X, spar, ...){
   NC <- ncol(X)
   NR <- nrow(X) 
+# Initialize the temp list
+  temp <- vector("list", NR)
+  AUC <- rep(NA,NR)
   for(i in 1:NR)
   {
-    temp[[i]] <- smooth.spline(1:NC, X[i,], df=df, all.knots=TRUE)
-    deriv0 <- predict(temp,seq(1,NC,0.1),deriv=0)$y
-    #deriv1 <- predict(temp,seq(1,NC,0.1),deriv=1)$y
+    temp[[i]] <- smooth.spline(X[i,], spar=spar)
+  # Use something like this:  
+  #  spline1 <- splinefun(1:100,X[1,], method="natural")
+  #  spline2 <- splinefun(1:100,X[2,], method="natural")
+    
+  #  plot(1:100,X[1,])
+    curve(spline1(x) - spline2(x), from=1, to=10, col=1, n=1001)
+    curve(spline1(x), add=TRUE, col=2, n=1001)
+    curve(spline2(x), add=TRUE, col=3, n=1001)
+    abline(0,0)
+    points(X[1,])
+    points(X[2,])
+    
+    integrate(spline1, lower=1, upper=100, subdivisions=1000)$value
   }
+  temp
 }
