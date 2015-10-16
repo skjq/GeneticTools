@@ -16,9 +16,8 @@ calcDistances.Splines <- function(X, spar, ...){
   AUC <- rep(NA,NR)
   for(i in 1:NR)
   {
-    temp[[i]] <- smooth.spline(X[i,], spar=spar)
-  # Use something like this:  
-  #  spline1 <- splinefun(1:100,X[1,], method="natural")
+    temp[[i]] <- splinefun(1:100,X[1,], method="natural")
+}
   #  spline2 <- splinefun(1:100,X[2,], method="natural")
     
   #  plot(1:100,X[1,])
