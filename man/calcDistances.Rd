@@ -15,16 +15,14 @@
 \arguments{
   \item{X}{Matrix with time series values.}
   \item{method}{Method  of choice to calculate the distance.}
-  \item{...}{Additional values passed to the smoothing function.}
+  \item{...}{Additional values.}
 }
 
 \details{
  This is an early attempt to implement a distance measure for time series clustering. It has not yet been used in
  productive code yet and hence should be used carefully.
 
- Currently there are two different methods available, the default is \code{method="euclidean"} and calculates a basic euclidean distance.
- The alternative is \code{"spline"}, what is a spline based approach. Here, ...
-
+ Currently there is only the basic euclidean method available the default is \code{method="euclidean"} 
  
 }
 \value{

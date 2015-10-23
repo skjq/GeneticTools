@@ -7,5 +7,5 @@ Author: Daniel Fischer
 Maintainer: Daniel Fischer <daniel.fischer@luke.fi>
 Depends: R (>= 3.1), gMWT (>= 1.0), Rcpp (>= 0.9.13), plotrix, hoardeR, snpStats
 LinkingTo: Rcpp, RcppArmadillo
-Description: This package is a loose collection of tools for the analysis of expression and genotype data, currently with the main focus on (e)QTL and MDR analysis.
+Description: A loose collection of tools for the analysis of expression and genotype data, currently with the main focus on (e)QTL and MDR analysis.
 License: GPL (>= 2)

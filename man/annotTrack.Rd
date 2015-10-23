@@ -28,10 +28,6 @@
 \examples{
 data(annotTrack)
 head(annotTrack)
-## Not run:
-library(hoardeR)
-importGTF(gtf="Bos_taurus.UMD3.1.76.gtf", nrow=1001, skip=5)
-## End(Not Run)
 }
 \keyword{datasets}
  
