@@ -19,7 +19,7 @@
 }
 
 \details{
- This is an early attempt to implement a distance measure for time series clustering. It has not yet been used in
+ This is an early attempt to implement a distance measure for time series clustering. It has not been used in
  productive code yet and hence should be used carefully.
 
  Currently there is only the basic euclidean method available the default is \code{method="euclidean"} 
