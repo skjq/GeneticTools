@@ -1,12 +1,14 @@
-eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, windowSize=0.5, method="LM", mc=1, sig=NULL, which=NULL,nper=2000 , verbose=TRUE){
+eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, windowSize=0.5, method="LM", mc=1, sig=NULL, which=NULL,nper=2000 , usehoardeR=FALSE, verbose=TRUE){
 
+    if(usehoardeR) stop("Currently not support, please keep the default setting!")
+  
   # If the annotations are given as data frame, we will transform them into a list
     if(is.data.frame(xAnnot)){
       if(is.factor(xAnnot[,1])) xAnnot[,1] <- as.character(xAnnot[,1])
       if(is.factor(xAnnot[,2])) xAnnot[,2] <- as.character(xAnnot[,2])
-      if(verbose==TRUE) cat("We will transform the gene annotations into a list at",date(),"!\n")
+      if(verbose==TRUE) cat("We will transform the gene annotations into a list (",date(),")!\n", sep="")
       xAnnot <- makeAnnotList(xAnnot)
-      if(verbose==TRUE) cat("We finished to transform the gene annotations at",date(),"\n")
+      if(verbose==TRUE) cat("We transformed the gene annotations (",date(),")!\n", sep="")
     }
 
   # Read in the genotype data if name is given, otherwise assume already imported SNPS are given as input
@@ -14,16 +16,22 @@ eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, window
     {
       # Check if there is a ped/map pair or vcf given as input
       # CASE: VCF
-      if(toupper(substr(geno,nchar(geno)-2, nchar(geno)))=="VCF"){
-        stop("The vcf format is not yet supported. Please use the ped/map format.")
-        # CASE: PED/MAP
+        if(toupper(substr(geno,nchar(geno)-2, nchar(geno)))=="VCF"){
+          stop("The vcf format is not yet supported. Please use the ped/map format.")
+      # CASE: PED/MAP
+        } else {
+          if(verbose==TRUE) cat("Start reading the genotype information at",date(),"(ped/map format assumed)\n")
+            if(usehoardeR){
+              genotData <- importPedMap(ped=geno)            
+            } else {
+              genotData <- read.pedfile(file=paste(geno,".ped",sep=""), snps=paste(geno,".map",sep=""))
+            }
+        }
+    # Case: No string provided, assume that genotype data was read in properly
       } else {
-        if(verbose==TRUE) cat("Start reading the genotype information at",date(),"(ped/map format assumed)\n")
-        genotData <- importPedMap(ped=geno)
+      # XXX: Include here still a input check!!!
+        genotData <- geno
       }
-    } else {
-      genotData <- geno
-    }
 
   # Input checks
     if(is.vector(gex) & is.null(xAnnot))
@@ -34,11 +42,14 @@ eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, window
     }
     if(is.matrix(gex) & is.null(xAnnot))
     {
-       # WHAT TO DO THEN?!
+      warning("No annotations given, we will test all given SNPs against all given expressions!\n gex is a matrix, hence this might take a while...\n")
+      xAnnot <- data.frame(gene="",Chr=as.character(genotData$map[1,1]),Start=genotData$map[1,4],End=genotData$map[1,4])
+      windowSize=NULL
+      
     }
 
-  # If no separate genOSamples object is given, we take those from the snpStats object:
-    if(is.null(genoSamples)) genoSamples <-  as.character(genotData$fam$IndividualID)
+  # If no separate genoSamples object is given, we take those from the snpStats object:
+    if(is.null(genoSamples)) genoSamples <-  as.character(genotData$fam$member)
   
   # Take only those genes from the annotation list that were requested
     if(!is.null(which)) xAnnot <- xAnnot[is.element(names(xAnnot),which)]
@@ -66,7 +77,7 @@ eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, window
     overlap <- is.element(rownames(gex),genoSamples)
     olPerc <- round(sum(overlap)/nrow(gex)*100,1)
     if(sum(overlap)==0) stop("No matching expression / genotype sample names!\n")
-    if(verbose==TRUE) cat("We have for",olPerc,"% of the samples in the expression data the genotype information. \n")
+    if(verbose==TRUE) cat("We have for",olPerc,"% of the samples in the expression data the genotype information available. \n")
 
   # Location statistics
     overlap <- is.element(colnames(gex),names(xAnnot))
@@ -87,65 +98,73 @@ eQTL <- function(gex, geno, xAnnot=NULL, xSamples=NULL, genoSamples=NULL, window
     }
 
   # Now go through all possible probes
-  eqtl <- list()
-  for(probeRun in 1:length(matchingProbes))
-  {
+    eqtl <- list()
+ 
+    for(probeRun in 1:length(matchingProbes)){
     # Do that for each possible location of the probe (might not be unique...)
-    tempAnnot <- xAnnot[[which((names(xAnnot)==matchingProbes[probeRun])==TRUE)]]
-    eqtlTemp <- list()
-    for(tempRun in 1:nrow(tempAnnot))
-    {
-      # Temporary values
-      SNPloc <- getSNPlocations(genotInfo=genotData$map,annot=tempAnnot[tempRun,],th=th)
-      SNPmatrix <- genotData$geno[,SNPloc$SNPcol]
-      genoGroups <- rearrange(SNPmatrix,rownames(gex),genoSamples)
-      
+      tempAnnot <- xAnnot[[which((names(xAnnot)==matchingProbes[probeRun])==TRUE)]]
+      eqtlTemp <- list()
+   
+      for(tempRun in 1:nrow(tempAnnot)){
+      # SNP locations of variants inside the provided window
+        SNPloc <- getSNPlocations(genotInfo=genotData$map,annot=tempAnnot[tempRun,],th=th)
+  
       # Run eQTL only if there are SNPs inside the window
-      if(dim(SNPloc$SNPloc)[1]>0){
-      # Type of eQTL
-      if(method=="LM"){
-	if(is.null(sig))
-        {
-	  eqtlTemp[[tempRun]] <- list(ProbeLoc=rep(tempRun,ncol(genoGroups)),TestedSNP=SNPloc[[1]],p.values=eqtlLM(genoGroups,gex[,probeRun]))
-	} else {
-	  p.values <- eqtlLM(genoGroups,gex[,probeRun])
-	  pPos <- p.values<sig
-	  eqtlTemp[[tempRun]] <- cbind(SNPloc[[1]][pPos,c(1,2,4)],p.values[pPos])
-	}
-      } else if(method=="directional"){
-        if(is.null(sig))
-        { 
-	  eqtlTemp[[tempRun]] <- list(ProbeLoc=rep(tempRun,ncol(genoGroups)),TestedSNP=SNPloc[[1]],p.values=eqtlDir.P(genoGroups,gex[,probeRun],mc=mc,nper=nper))
-	} else {
-	  p.values <- eqtlDir.P(genoGroups,gex[,probeRun],mc=mc,nper=nper)
-	  pPos <- p.values<sig
-	  eqtlTemp[[tempRun]] <- cbind(SNPloc[[1]][pPos,c(1,2,4)],p.values[pPos])
-	}
-      } 
-     } else {
-        warning("There were no variants within the window")
-        eqtlTemp[[tempRun]] <- list(ProbeLoc=-1,TestedSNP=-1,p.values=-1)
-     }
+        if(dim(SNPloc$SNPloc)[1]>0){
+          if(usehoardeR){
+            SNPmatrix <- genotData$geno[,SNPloc$SNPcol]
+            genoGroups <- rearrange(SNPmatrix,rownames(gex),genoSamples)
+          } else {
+            SNPmatrix <- genotData$genotypes[,SNPloc$SNPcol]
+            genoGroups <- as(SNPmatrix,"numeric")
+            genoGroups <- rearrange(genoGroups,rownames(gex),genoSamples)
+          }
+
+        # eQTL case : LM
+          if(method=="LM"){
+          # if sig is set to Null all results will be reported - This might be very memory consuming!!!
+  	        if(is.null(sig)){
+  	            eqtlTemp[[tempRun]] <- list(ProbeLoc=rep(tempRun,ncol(genoGroups)),TestedSNP=SNPloc[[1]],p.values=eqtlLM(genoGroups,gex[,probeRun], mc=mc))
+  	        } else {
+  	            p.values <- eqtlLM(genoGroups,gex[,probeRun], mc=mc)
+            	  pPos <- p.values<sig
+  	            eqtlTemp[[tempRun]] <- cbind(SNPloc[[1]][pPos,c(1,2,4)],p.values[pPos])
+  	        }
+        # eQTL case: directional
+          } else if(method=="directional"){
+          # if sig is set to Null all results will be reported - This might be very memory consuming!!!
+            if(is.null(sig)){ 
+  	           eqtlTemp[[tempRun]] <- list(ProbeLoc=rep(tempRun,ncol(genoGroups)),TestedSNP=SNPloc[[1]],p.values=eqtlDir.P(genoGroups,gex[,probeRun],mc=mc,nper=nper))
+  	        } else {
+  	           p.values <- eqtlDir.P(genoGroups,gex[,probeRun],mc=mc,nper=nper)
+  	           pPos <- p.values<sig
+  	           eqtlTemp[[tempRun]] <- cbind(SNPloc[[1]][pPos,c(1,2,4)],p.values[pPos])
+          	}
+          } 
+       } else {
+          warning("There were no variants within the window of gene ", matchingProbes[probeRun])
+          eqtlTemp[[tempRun]] <- list(ProbeLoc=-1,TestedSNP=-1,p.values=-1)
+       }
+      }
+      
+      # Join the output
+      if(is.null(sig))
+      {
+        eqtl[[probeRun]] <- joinEQTL(eqtlTemp)
+        eqtl[[probeRun]]$GeneInfo <- tempAnnot
+      } else {
+   #     if(is.null(windowSize))
+   #     {
+  	bedTemp <- joinEQTLsig(eqtlTemp)
+  	bedTemp <- cbind(bedTemp,rep(matchingProbes[probeRun],max(1,nrow(bedTemp))))
+  	colnames(bedTemp) <- c("chr", "SNP", "Location", "p.value", "Assoc.Gene")
+  	eqtl[[probeRun]] <- bedTemp
+   #     } else {
+  #	eqtl[[probeRun]] <- joinEQTLsig(eqtlTemp)
+   #     }
+      }
+      if(verbose==TRUE) cat ("We calculated eQTLs for gene",matchingProbes[probeRun]," (",date(),")\n", sep="")
     }
-    
-    # Join the output
-    if(is.null(sig))
-    {
-      eqtl[[probeRun]] <- joinEQTL(eqtlTemp)
-      eqtl[[probeRun]]$GeneInfo <- tempAnnot
-    } else {
- #     if(is.null(windowSize))
- #     {
-	bedTemp <- joinEQTLsig(eqtlTemp)
-	bedTemp <- cbind(bedTemp,rep(matchingProbes[probeRun],nrow(bedTemp)))
-	colnames(bedTemp) <- c("chr", "SNP", "Location", "p.value", "Assoc.Gene")
-	eqtl[[probeRun]] <- bedTemp
- #     } else {
-#	eqtl[[probeRun]] <- joinEQTLsig(eqtlTemp)
- #     }
-    }
-    if(verbose==TRUE) cat ("We investigated",probeRun,"gene eQTLs at",date(),"\n")
-  }
 
   # Return the result
   if(is.null(sig))

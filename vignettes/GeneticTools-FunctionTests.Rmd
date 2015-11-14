@@ -1,0 +1,48 @@
+---
+title: "Function Tests for GeneticTools"
+author: "Daniel Fischer"
+date: "November 13, 2015"
+output: pdf_document
+---
+
+Load the package
+```{r}
+  library(GeneticTools)
+  library(snpStats)
+  exampleDataDir <- "/home/medafi/ownCloud/Luke/R-Packages/GeneticTools/exampleData"
+```  
+  
+# calcDistances
+
+```{r}
+  set.seed(4233)
+  X <-matrix(rnorm(1000),ncol=100)
+  calcDistances(X)
+  
+  calcDistances(X, method="spli")
+  
+  res.eu <- calcDistances(X)
+  res.sp <- calcDistances(X, method="sp", spar=0.1)
+```
+  
+# eQTL
+ 
+## Case: All files are prepare by hand:
+
+```{r}
+  # Import the expression data
+    exprData <- read.table(file.path(exampleDataDir,"example.expr"), header=TRUE)
+  # Assign the Sample names to the rows and delete the non gene expression columns
+    rownames(exprData) <- exprData[,1]
+    exprData <- exprData[,-c(1,2)]
+  # Import the ped/map file pairs using the snpStas library
+    genoData <- read.pedfile(file=file.path(exampleDataDir,"example.ped"), snps=file.path(exampleDataDir,"example.map"))
+    annotData <- read.table(file.path(exampleDataDir,"genelocations.loc"))
+  annotData <- annotData[,c(4,1,2,3)]
+  colnames(annotData) <- c("Gene", "Chr", "Start", "End")
+  eqtlres <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData)
+  eqtlres.sig <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, sig=0.05)
+  eqtlres.sig <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, sig=0.05, which=c("PCDH1","PCDH10"))
+  
+  system.time(eqtlres.trans <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, windowSize=NULL))
+```
