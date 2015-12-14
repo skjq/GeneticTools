@@ -1,7 +1,7 @@
 ---
 title: "Function Tests for GeneticTools"
 author: "Daniel Fischer"
-date: "November 13, 2015"
+date: "November 16, 2015"
 output: pdf_document
 ---
 
@@ -9,7 +9,7 @@ Load the package
 ```{r}
   library(GeneticTools)
   library(snpStats)
-  exampleDataDir <- "/home/medafi/ownCloud/Luke/R-Packages/GeneticTools/exampleData"
+  exampleDataDir <- "/home/ejo138/ownCloud/Luke/R-Packages/GeneticTools/exampleData"
 ```  
   
 # calcDistances
@@ -29,7 +29,7 @@ Load the package
  
 ## Case: All files are prepare by hand:
 
-```{r}
+```{r cache=TRUE}
   # Import the expression data
     exprData <- read.table(file.path(exampleDataDir,"example.expr"), header=TRUE)
   # Assign the Sample names to the rows and delete the non gene expression columns
@@ -44,5 +44,5 @@ Load the package
   eqtlres.sig <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, sig=0.05)
   eqtlres.sig <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, sig=0.05, which=c("PCDH1","PCDH10"))
   
-  system.time(eqtlres.trans <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, windowSize=NULL))
+  eqtlres.trans <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, windowSize=NULL)
 ```
