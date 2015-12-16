@@ -1,14 +1,19 @@
 ---
 title: "Function Tests for GeneticTools"
 author: "Daniel Fischer"
-date: "November 13, 2015"
+date: "November 16, 2015"
 output: pdf_document
 ---
 
 Load the package
 ```{r setParameters}
   library(GeneticTools)
+<<<<<<< HEAD
   exampleDataDir <- "/home/fischuu/ownCloud/Luke/R-Packages/GeneticTools/exampleData"
+=======
+  library(snpStats)
+  exampleDataDir <- "/home/ejo138/ownCloud/Luke/R-Packages/GeneticTools/exampleData"
+>>>>>>> a9013138afb3cd93e082951d4d6b41023b9a5104
 ```  
   
 # calcDistances
@@ -23,7 +28,13 @@ Load the package
   
 # eQTL
  
+<<<<<<< HEAD
 ```{r eQTL}
+=======
+## Case: All files are prepare by hand:
+
+```{r cache=TRUE}
+>>>>>>> a9013138afb3cd93e082951d4d6b41023b9a5104
   # Import the expression data
     exprData <- read.table(file.path(exampleDataDir,"example.expr"), header=TRUE)
   # Assign the Sample names to the rows and delete the non gene expression columns
@@ -66,6 +77,7 @@ Load the package
   
   eqtlres.import <- eQTL(gex=exprData, geno=file.path(exampleDataDir,"example"), xAnnot=annotData)
   
+<<<<<<< HEAD
   set.seed(255)
   rownames(exprData) <- sample(10000,500)
   eqtlres1 <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData)
@@ -84,4 +96,7 @@ Load the package
   genotypePlot(snp="chr16:67319486", gene="PCDH1", gex=exprData, geno=genoData)
   genotypePlot(snp="chr16:67319622", gene="PCDH1", gex=exprData, geno=genoData)
   genotypePlot(snp="chr16:67319622", gex=exprData[,1], geno=genoData)
+=======
+  eqtlres.trans <- eQTL(gex=exprData, geno=genoData, xAnnot=annotData, windowSize=NULL)
+>>>>>>> a9013138afb3cd93e082951d4d6b41023b9a5104
 ```
