@@ -9,7 +9,7 @@ getSNPlocations <- function(genotInfo,annot,th){
     chrSNPs[,4] <- as.numeric(as.character(chrSNPs[,4]))  
     lowSNPs <- chrSNPs[chrSNPs[,4]>(annot$Start-th),]
     SNPs <- lowSNPs[lowSNPs[,4]<(annot$End+th),]
-    if(is.null(th)) SNPs <- chrSNPs
+#    if(is.null(th)) SNPs <- chrSNPs
     output <- list(SNPloc=SNPs,SNPcol=as.numeric(rownames(SNPs)))
   } else {
     output <- list(SNPloc=genotInfo, SNPcol=as.numeric(rownames(genotInfo)))

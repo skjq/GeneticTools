@@ -16,7 +16,8 @@
   \item{snp}{\code{String}, specifies the genotype name.}
   \item{gene}{\code{String}, specifies the gene name.}
   \item{eqtl}{An \code{eqtl} object.}
-  \item{geneAnnot}{\code{String}, specifies the gene name.}
+  \item{gex}{Matrix or vector with expression values}
+  \item{geno}{Genotype data}
   \item{ylab}{Optional x-axis label.}
   \item{xlab}{optional y-axis label}
   \item{mainlab}{\code{Logical}, shall main title be plotted}

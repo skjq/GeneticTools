@@ -8,16 +8,16 @@
     xx <- x
     if(!is.null(which)==TRUE) xx <- x[which]
 
-    X <- data.frame(Chr=-1,Start=-1,End=-1,Name="-1", Gene="-1")
+    X <- data.frame(Chr=-1,Start=-1,End=-1,Name="-1", Gene="-1", p.value=-1)
     
     if(output=="bed")
     {
     for(testRun in 1:length(xx))
     {
       tempRes <- xx[[testRun]]
-      repSNP <- tempRes[[2]][((tempRes[[3]]>-1)&(tempRes[[3]]<sig)),]
+      repSNP <- tempRes[[2]][((tempRes[[3]]>-1)&(tempRes[[3]]<=sig)),]
       if(nrow(repSNP)>0){
-        temp <- data.frame(Chr=repSNP[,1],Start=repSNP[,4],End=repSNP[,4],Name=repSNP[,2], Gene=names(xx)[testRun])
+        temp <- data.frame(Chr=repSNP[,1],Start=repSNP[,4],End=repSNP[,4],Name=repSNP[,2], Gene=names(xx)[testRun], p.value=tempRes[[3]][tempRes[[3]]<=sig])
         X <- rbind(X,temp)
       }
     }

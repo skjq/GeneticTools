@@ -110,8 +110,8 @@ will be soon available also.
 }
 
 \references{
-  \cite{Fischer, D., Oja, H., Sen, P.K., Schleutker, J., Wahlfors, T. (2014): Generalized Mann–Whitney Type Tests for Microarray Experiments, Scandinavian Journal of Statistics, 3, pages 672–692, 
-           doi: 10.1111/sjos.12055}
+  \cite{Fischer, D., Oja, H., Sen, P.K., Schleutker, J., Wahlfors, T. (2014): Generalized Mann-Whitney Type Tests for Microarray Experiments, Scandinavian Journal of Statistics, 3, pages 672-692, 
+           doi: 10.1111/sjos.12055.}
 
   \cite{Fischer, D., Oja, H. (2013): Mann-Whitney Type Tests for Microarray Experiments: The R Package gMWT, submitted article.}
 }

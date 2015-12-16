@@ -5,6 +5,6 @@ joinEQTLsig <- function(eqtlTemp){
     for(i in 2:length(eqtlTemp)){
       output <- rbind(output,eqtlTemp[[i]])
     }
-  }
+  } 
   output
 }
